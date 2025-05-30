@@ -27,7 +27,7 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
-  const [best, setBest] = useState('a')
+  const [best, setBest] = useState('')
   const [votes, setVotes] = useState(new Uint16Array(anecdotes.length))
 
   function getRandomInt(min, max) {
