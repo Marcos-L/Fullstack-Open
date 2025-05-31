@@ -10,7 +10,6 @@ This is a repository for submitting exercises for the Fullstack Open course foun
 * SingleAppDiagram.md
 ## Exercise 0.6
 * SingleAppNewNote.md
-
 </details>
 
 <details>
@@ -22,4 +21,15 @@ This is a repository for submitting exercises for the Fullstack Open course foun
 * unicafe/
 ## Exercises 1.12 - 1.14
 * anecdotes/
+</details>
+
+<details>
+<summary><b style="font-size:x-large">Part 2</b></summary>
+
+## Exercises 2.1 - 2.5
+* courseinfo/
+## Exercises 2.6 - 2.17
+* phonebook/
+## Exercises 2.18 - 2.20
+* countries/
 </details>
