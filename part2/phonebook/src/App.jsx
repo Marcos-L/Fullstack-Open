@@ -4,6 +4,7 @@ import pbServices from './services/phonebookservices'
 import PhoneList from './components/phonelist'
 import AddPerson from './components/addperson'
 import SearchName from './components/searchperson'
+import NotificationMessage from './components/notification'
 
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setFilterName] = useState('')
+  const [notificationMsg, setNotification] = useState({msg:'', type:'null'})
 
   //Effects
   useEffect(()=>{pbServices.getDB().then(db=>setPersons(db))}, [])
@@ -19,7 +21,7 @@ const App = () => {
   //Functions
   const handleNameChange = (event) => {
     var name = event.target.value
-    name = name.replace(/[^A-Za-z\-]+/,'')
+    name = name.replace(/[^A-Za-z\- ]+/,'')
     setNewName(name)
   }
 
@@ -31,7 +33,7 @@ const App = () => {
 
   const searchFunction = (event) => {
     var name = event.target.value
-    name = name.replace(/[^A-Za-z\-]+/,'')
+    name = name.replace(/[^A-Za-z\- ]+/,'')
     setFilterName(name)
   }
 
@@ -45,6 +47,10 @@ const App = () => {
         setPersons(new_list)
         setNewName('')
         setNewNumber('')
+        setNotification({msg:`${newEntry.name} has been added to the database.`, type:'success'})
+      })
+      .catch(response => {
+        setNotification({msg:`Error when adding ${new_person.name}.`, type:'error'})
       })
     }
     else{
@@ -52,9 +58,17 @@ const App = () => {
       if (confirmation){
         const updated_person = persons.find(elem=>elem.name===newName)
         updated_person.number = newNumber
-        pbServices.modDb(updated_person.id, updated_person).then(updatedData=>
-          setPersons(persons.map(elem=>elem.id===updatedData.id ? updatedData : elem))
-        )
+        pbServices.modDb(updated_person.id, updated_person).then(updatedData=>{
+            setPersons(persons.map(elem=>elem.id===updatedData.id ? updatedData : elem))
+            setNotification({msg:`${updatedData.name} has been updated.`, type:'success'})
+          })
+          .catch(response => {
+            switch (response.status){
+            case 404:
+              setNotification({msg:`Error: ${updated_person.name} isn't in the database.`, type:'error'})
+              setPersons(persons.filter(elem=>elem.id!=updated_person.id))
+            break;}
+          })
       }
     }
   }
@@ -63,9 +77,19 @@ const App = () => {
     const person = persons.find(elem=>elem.id===id)
     const confirmation = confirm(`Are you sure you want to delete ${person.name}?`)
     if (confirmation){
-    pbServices.delFromDB(id).then(response=>
-      setPersons(persons.filter(elem=>elem.id!=id))
-    )}
+    pbServices.delFromDB(id).then(response=>{
+        setPersons(persons.filter(elem=>elem.id!=id))
+        setNotification({msg:`${response.name} has been deleted.`, type:'success'})
+      })
+      .catch(response => {
+        switch (response.status){
+          case 404:
+            setNotification({msg:`Error: ${person.name} isn't in the database.`, type:'error'})
+            setPersons(persons.filter(elem=>elem.id!=id))
+          break;
+        }
+      })
+    }
   }
 
   //Code
@@ -73,8 +97,11 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <NotificationMessage {...notificationMsg}/>
+      <h2>Search</h2>
       <SearchName onChange={searchFunction} name={searchName}/>
+      <h2>Add new number</h2>
       <AddPerson name={newName} nameChange={handleNameChange} number={newNumber} numberChange={handleNumberChange} onSubmit={addName}/>
       <h2>Numbers</h2>
       <ul><PhoneList list = {nameToShow} onClick={deleteName}/></ul>
