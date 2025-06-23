@@ -1,0 +1,17 @@
+{
+  "name": "phonebook",
+  "version": "0.0.1",
+  "description": "Backend Phonebook Exercise",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "author": "Marcos Loaiza",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0"
+  }
+}

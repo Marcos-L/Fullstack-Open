@@ -1,0 +1,16 @@
+{
+  "name": "phonebook",
+  "version": "0.0.1",
+  "description": "Backend Phonebook Exercise",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "author": "Marcos Loaiza",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^19.1.0",
+    "vite": "^6.3.5"
+  }
+}
