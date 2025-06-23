@@ -16,7 +16,7 @@ const App = () => {
   const [notificationMsg, setNotification] = useState({msg:'', type:'null'})
 
   //Effects
-  useEffect(()=>{pbServices.getDB().then(db=>setPersons(db))}, [])
+  useEffect(()=>{pbServices.getDB().then(db=>{setPersons(db)})}, [])
 
   //Functions
   const handleNameChange = (event) => {
@@ -50,7 +50,7 @@ const App = () => {
         setNotification({msg:`${newEntry.name} has been added to the database.`, type:'success'})
       })
       .catch(response => {
-        setNotification({msg:`Error when adding ${new_person.name}.`, type:'error'})
+        setNotification({msg:`Error when adding ${new_person.name}:\n${response.response.data.error}.`, type:'error'})
       })
     }
     else{
@@ -63,11 +63,7 @@ const App = () => {
             setNotification({msg:`${updatedData.name} has been updated.`, type:'success'})
           })
           .catch(response => {
-            switch (response.status){
-            case 404:
-              setNotification({msg:`Error: Failed to update ${updated_person.name}.`, type:'error'})
-              //setPersons(persons.filter(elem=>elem.id!=updated_person.id))
-            break;}
+            setNotification({msg:`Error: Failed to update ${updated_person.name}: ${response.response.data.error}.`, type:'error'})
           })
       }
     }
