@@ -1,0 +1,19 @@
+{
+  "name": "bloglist",
+  "version": "0.0.1",
+  "description": "Fullstack Course bloglist app",
+  "main": "index.js",
+  "scripts": {
+    "test": "--watch index.js"
+  },
+  "keywords": [
+    "blog"
+  ],
+  "author": "Marcos Loaiza",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.0"
+  }
+}
