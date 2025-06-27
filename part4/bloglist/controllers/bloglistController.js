@@ -1,6 +1,8 @@
 const bloglistRouter = require('express').Router()
 const Blog = require('../models/bloglistModel')
 
+// Router is set to /api/blog
+
 bloglistRouter.get('/', (request, response) => {
   Blog.find({}).then((blogs) => {
     response.json(blogs)

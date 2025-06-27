@@ -12,7 +12,7 @@ const middleware = require('./utils/middleware')
 const app = express()
 
 //Connect to DB
-mongoose.connect(mongoUrl)
+mongoose.connect(config.MONGODB_URI)
 mongoose
   .connect(config.MONGODB_URI)
   .then(() => {
