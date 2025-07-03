@@ -5,7 +5,8 @@ const mongoose = require('mongoose')
 //Project files
 const config = require('./utils/config')
 const logger = require('./utils/logger')
-const notesRouter = require('./controllers/bloglistController')
+const blogsRouter = require('./controllers/bloglistController')
+const userRouter = require('./controllers/usersController')
 const middleware = require('./utils/middleware')
 
 //Backend object
@@ -26,8 +27,9 @@ mongoose
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-//Set Router
-app.use('/api/blog', notesRouter)
+//Set Routers
+app.use('/api/blog', blogsRouter)
+app.use('/api/users', userRouter)
 
 //Error Handlers
 app.use(middleware.unknownEndpoint)

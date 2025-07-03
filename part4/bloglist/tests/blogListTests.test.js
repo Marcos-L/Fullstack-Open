@@ -1,11 +1,14 @@
 const { test, describe, beforeEach, after } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 const supertest = require('supertest')
 
 const app = require('../app')
 const Blog = require('../models/bloglistModel')
-const { getInvalidId } = require('./test_helper')
+const User = require('../models/usersModel')
+const { getInvalidId, initialDatabase } = require('./blogTest_helper')
+const { getInvalidUserId, initialUsers } = require('./userTests_helper')
 
 const api = supertest(app)
 
@@ -19,56 +22,6 @@ test('dummy returns one', () => {
 })
 
 describe('Database supertests', () => {
-  const initialDatabase = [
-    {
-      _id: '5a422a851b54a676234d17f7',
-      title: 'React patterns',
-      author: 'Michael Chan',
-      url: 'https://reactpatterns.com/',
-      likes: 7,
-      __v: 0
-    },
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-      likes: 5,
-      __v: 0
-    },
-    {
-      _id: '5a422b3a1b54a676234d17f9',
-      title: 'Canonical string reduction',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-      likes: 12,
-      __v: 0
-    },
-    {
-      _id: '5a422b891b54a676234d17fa',
-      title: 'First class tests',
-      author: 'Robert C. Martin',
-      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-      likes: 10,
-      __v: 0
-    },
-    {
-      _id: '5a422ba71b54a676234d17fb',
-      title: 'TDD harms architecture',
-      author: 'Robert C. Martin',
-      url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-      likes: 12,
-      __v: 0
-    },
-    {
-      _id: '5a422bc61b54a676234d17fc',
-      title: 'Type wars',
-      author: 'Robert C. Martin',
-      url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-      likes: 13,
-      __v: 0
-    }
-  ]
 
   beforeEach( async () => {
     await Blog.deleteMany({})
@@ -522,4 +475,61 @@ describe('Author with most likes', () => {
   test('Most liked of multiple is the one with most total likes', () => {
     assert.deepStrictEqual(listHelper.bestAuthor(blogs), { author:'Robert C. Martin', likes:30 })
   })
+})
+
+describe('Userbase Tests', () => {
+	beforeEach( async () => {
+    console.log('Getting users ready...')
+    await User.deleteMany({})
+
+    const JohnPass = await bcrypt.hash('DoeMaster123', 1)
+    const JanePass = await bcrypt.hash('JaneDoeIsNumber1', 1)
+    const SalazarPass = await bcrypt.hash('NoLaTengo963', 1)
+
+		const users = [
+      {
+        _id:'6865e4d38b57a82589cc3bc2',
+        username: "JohnDoe123",
+        name:"John Doe",
+        passwordHash: JohnPass
+      },
+      {
+        _id:'6865e4d38b57a82589cc3bc3',
+        username: "JaneDoe987",
+        name:"Jane Doe",
+        passwordHash: JanePass
+      },
+      {
+        _id:'6865e4d38b57a82589cc3bc4',
+        username: "Salazar",
+        name:"Oscar",
+        passwordHash: SalazarPass
+      }
+    ]
+    
+		await User.insertMany(users)
+		console.log('Users ready!')
+	})
+
+	after( async () => {
+		await mongoose.connection.close()
+	})
+
+	test('GET all users', async () => {
+		const response = await api.get('/api/users')
+			.expect(200)
+			.expect('content-type', /application\/json/)
+
+    const users = response.body
+    assert.strictEqual(users.length, initialUsers.length)
+	})
+
+  test('GET single users', async () => {
+		const response = await api.get('/api/users')
+			.expect(200)
+			.expect('content-type', /application\/json/)
+
+    const users = response.body
+    assert.strictEqual(users.length, initialUsers.length)
+	})
 })
