@@ -54,16 +54,19 @@ describe('Database supertests', () => {
     assert.strictEqual(response.body.likes, initialDatabase[random_blog].likes)
   })
 
-  test('A valid blog is added', async () => {
+  test('POST a valid blog', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
     const new_blog = {
       title: 'Test Blog Post',
       author: 'Robert C. Martin',
-      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
       likes: 10,
     }
 
     await api.post('/api/blog')
       .send(new_blog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('content-type', /application\/json/)
 
@@ -75,7 +78,9 @@ describe('Database supertests', () => {
     assert(contents.includes(`"title":"${new_blog.title}","author":"${new_blog.author}","url":"${new_blog.url}","likes":${new_blog.likes}`))
   })
 
-  test('A blog without title/url is NOT added', async () => {
+  test('POST an invalid blog is NOT added', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
     const new_blog = {
       title: 'Test Blog Post',
       author: 'Robert C. Martin',
@@ -91,10 +96,12 @@ describe('Database supertests', () => {
 
     await api.post('/api/blog')
       .send(titleless_blog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
     await api.post('/api/blog')
       .send(urlless_blog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
 
     const response = await api.get('/api/blog')
@@ -106,7 +113,9 @@ describe('Database supertests', () => {
     assert(!contents.includes(`"title":"${new_blog.title}","author":"${new_blog.author}","url":"","likes":${new_blog.likes}`))
   })
 
-  test('A blog without likes defaults to 0', async () => {
+  test('POST a blog without likes defaults to 0', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
     const new_blog = {
       title: 'Test Blog Post',
       author: 'Robert C. Martin',
@@ -115,6 +124,7 @@ describe('Database supertests', () => {
 
     await api.post('/api/blog')
       .send(new_blog)
+      .set('Authorization', `Bearer ${token}`)
       .expect(201)
       .expect('content-type', /application\/json/)
 
@@ -125,11 +135,35 @@ describe('Database supertests', () => {
     assert.strictEqual(response.body.length, initialDatabase.length+1)
     assert(contents.includes(`"title":"${new_blog.title}","author":"${new_blog.author}","url":"${new_blog.url}","likes":0`))
   })
+
+  test('POST fails if there is no user', async () => {
+    const new_blog = {
+      title: 'Test Blog Post',
+      author: 'Robert C. Martin',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
+      likes: 10,
+    }
+
+    await api.post('/api/blog')
+      .send(new_blog)
+      .expect(401)
+      .expect('content-type', /application\/json/)
+
+    const response = await api.get('/api/blog')
+
+    const contents = JSON.stringify(response.body)
+
+    assert.strictEqual(response.body.length, initialDatabase.length)
+    assert(!contents.includes(`"title":"${new_blog.title}","author":"${new_blog.author}","url":"${new_blog.url}","likes":${new_blog.likes}`))
+  })
   
-  test('Delete of a blog works and returns that blog', async () => {
-    const random_blog = Math.floor(Math.random()*initialDatabase.length)
-    const blog_to_delete = initialDatabase[random_blog]
+  test('DELETE of a blog works and returns that blog', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
+    
+    const blog_to_delete = initialDatabase[3]
     await api.delete(`/api/blog/${blog_to_delete._id}`)
+      .set('Authorization', `Bearer ${token}`)
 
     const response = await api.get('/api/blog')
     const contents = JSON.stringify(response.body)
@@ -138,32 +172,92 @@ describe('Database supertests', () => {
     assert(!contents.includes(`"title":"${blog_to_delete.title}","author":"${blog_to_delete.author}","url":"${blog_to_delete.url}","likes":${blog_to_delete.likes}`))
   })
 
-  test('Delete of an invalid id returns an error', async () => {
+  test('DELETE of an invalid id returns an error', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
+
     const invalid_id = getInvalidId()
     await api.delete(`/api/blog/${invalid_id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
+
+    assert(true)
   })
 
-  test('Modifying a missing blog return an error', async () => {
+  test('DELETE can NOT be done by a different user', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
+    
+    const blog_to_delete = initialDatabase[0]
+    await api.delete(`/api/blog/${blog_to_delete._id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401)
+
+    const response = await api.get('/api/blog')
+    const contents = JSON.stringify(response.body)
+    
+    assert.strictEqual(response.body.length, initialDatabase.length)
+    assert(contents.includes(`"title":"${blog_to_delete.title}","author":"${blog_to_delete.author}","url":"${blog_to_delete.url}","likes":${blog_to_delete.likes}`))
+  })
+
+  test('PATCH a missing blog return an error', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
+
     const invalid_id = getInvalidId()
     await api.patch(`/api/blog/${invalid_id}`)
       .send({likes: 42})
+      .set('Authorization', `Bearer ${token}`)
       .expect(400)
+
+    assert(true)
   })
 
-  test('Modifying a blog works and returns the new version of the blog', async () => {
-    const random_blog = Math.floor(Math.random()*initialDatabase.length)
-    const blog_to_mod = initialDatabase[random_blog]
+  test('PATCH a blog works and returns the new version of the blog', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
+
+    const blog_to_mod = initialDatabase[3]
     let likes = blog_to_mod.likes + 30
 
     await api.patch(`/api/blog/${blog_to_mod._id}`)
       .send({likes: likes})
+      .set('Authorization', `Bearer ${token}`)
 
     const response = await api.get(`/api/blog/${blog_to_mod._id}`)
 
     assert.strictEqual(response.body.likes, likes)
   })
 
+  test('PATCH can NOT be done by another user', async () => {
+    const login = await api.post('/api/login').send({ username: 'JohnDoe123', password:'DoeMaster123'})
+    const token = login.body.token
+
+    const blog_to_mod = initialDatabase[0]
+    let likes = blog_to_mod.likes + 30
+
+    await api.patch(`/api/blog/${blog_to_mod._id}`)
+      .send({likes: likes})
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401)
+
+    const response = await api.get(`/api/blog/${blog_to_mod._id}`)
+
+    assert.strictEqual(response.body.likes, blog_to_mod.likes)
+  })
+
+  test('PATCH requires a login', async () => {
+    const blog_to_mod = initialDatabase[0]
+    let likes = blog_to_mod.likes + 30
+
+    await api.patch(`/api/blog/${blog_to_mod._id}`)
+      .send({likes: likes})
+      .expect(401)
+
+    const response = await api.get(`/api/blog/${blog_to_mod._id}`)
+
+    assert.strictEqual(response.body.likes, blog_to_mod.likes)
+  })
 })
 
 describe('Total Likes', () => {
@@ -532,4 +626,61 @@ describe('Userbase Tests', () => {
     const users = response.body
     assert.strictEqual(users.length, initialUsers.length)
 	})
+
+  test('POST a new valid user', async () => {
+    const new_user = {
+      username:'Xx_Galatea__xX',
+      name:'ZubatFan',
+      password:'CrobatArceusNumber1'
+    }
+
+    await api.post('/api/users')
+      .send(new_user)
+      .expect(201)
+
+    const response = await api.get('/api/users')
+    const users = response.body
+
+    assert.strictEqual(users.length, initialUsers.length + 1)
+    assert(JSON.stringify(users).includes(`"username":"${new_user.username}","name":"${new_user.name}"`))
+  })
+
+  test('POST rejects an invalid user', async () => {
+    const no_username = {
+      username:'',
+      name:'ZubatFan',
+      password:'CrobatArceusNumber1'
+    }
+
+    const username_taken = {
+      username:initialUsers[0].username,
+      name:'ZubatFan',
+      password:'CrobatArceusNumber1'
+    }
+
+    const short_password = {
+      username:'Xx_Galatea_xX',
+      name:'ZubatFan',
+      password:'C4'
+    }
+
+    await api.post('/api/users')
+      .send(no_username)
+      .expect(400)
+
+    await api.post('/api/users')
+      .send(username_taken)
+      .expect(400)
+
+    await api.post('/api/users')
+      .send(short_password)
+      .expect(400)
+
+    const response = await api.get('/api/users')
+    const users = response.body
+
+    assert.strictEqual(users.length, initialUsers.length)
+    assert(!JSON.stringify(users).includes(`"username":""`))
+    assert(!JSON.stringify(users).includes(`"username":"${short_password.username}"`))
+  })
 })

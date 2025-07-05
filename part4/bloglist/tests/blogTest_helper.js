@@ -7,6 +7,7 @@ const initialDatabase = [
       author: 'Michael Chan',
       url: 'https://reactpatterns.com/',
       likes: 7,
+      user: '6865e4d38b57a82589cc3bc3',
       __v: 0
     },
     {
@@ -15,6 +16,7 @@ const initialDatabase = [
       author: 'Edsger W. Dijkstra',
       url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
       likes: 5,
+      user: '6865e4d38b57a82589cc3bc4',
       __v: 0
     },
     {
@@ -23,6 +25,7 @@ const initialDatabase = [
       author: 'Edsger W. Dijkstra',
       url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
       likes: 12,
+      user: '6865e4d38b57a82589cc3bc4',
       __v: 0
     },
     {
@@ -31,6 +34,7 @@ const initialDatabase = [
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
       likes: 10,
+      user: '6865e4d38b57a82589cc3bc2',
       __v: 0
     },
     {
@@ -39,6 +43,7 @@ const initialDatabase = [
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
       likes: 12,
+      user: '6865e4d38b57a82589cc3bc3',
       __v: 0
     },
     {
@@ -47,6 +52,7 @@ const initialDatabase = [
       author: 'Robert C. Martin',
       url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
       likes: 13,
+      user: '6865e4d38b57a82589cc3bc2',
       __v: 0
     }
   ]
@@ -56,6 +62,7 @@ const getInvalidId = async () => {
         title: 'Dummy Post',
         author: 'Tom Sayer',
         url: 'This is totally a valid URL',
+        user: '6865e4d38b57a82589cc3bc2',
     }
     const blog = new Blog(dummy_post)
     await blog.save()
