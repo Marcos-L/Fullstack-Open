@@ -43,7 +43,8 @@ This is a repository for submitting exercises for the Fullstack Open course foun
 
 <details>
 <summary><b style="font-size:x-large">Part 4: Testing Express servers, user administration</b></summary>
-
+## Exercises 4.1 - 4.23
+* bloglist/
 </details>
 
 <details>
