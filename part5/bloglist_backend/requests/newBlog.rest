@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blog
+Content-Type: application/json
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4Njg2MWRkNDM0M2U5NWNkZmY4OGQ4MSIsImlhdCI6MTc1MTcyNzgxNX0.hPh1B47XazXW0--IJXQgTS1DrjlAI8YTruoOW4bYkMo
+
+{
+    "title":"Blog 3",
+    "author": "John Doe",
+    "url":"http://localhost:3003/api/blog"
+}

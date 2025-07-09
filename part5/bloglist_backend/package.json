@@ -1,0 +1,32 @@
+{
+  "name": "bloglist",
+  "version": "0.0.1",
+  "description": "Fullstack Course bloglist app",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development node --watch index.js",
+    "test": "cross-env  NODE_ENV=test node --test",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "blog"
+  ],
+  "author": "Marcos Loaiza",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.16.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "eslint": "^9.29.0",
+    "supertest": "^7.1.1"
+  }
+}
