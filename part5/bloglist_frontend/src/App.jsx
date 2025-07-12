@@ -1,27 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import LoginForm from './components/loginForm'
 import BlogList from './components/blogList'
 import PostForm from './components/postForm'
 import StatusMessage from './components/statusMessage'
+import Toggable from './components/toggable'
+
 import services from './services/blogServices'
 
 function App() {
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
   const [status, setStatus] = useState(null)
-  
-  useEffect(()=>{
-    let timer = setInterval(()=>{
+
+  useEffect(() => { //Status Timer
+    let timer = setInterval(() => {
       setStatus(null)
       clearInterval(timer)
     }, 5000)
   }, [status])
 
-  useEffect(()=>{
-    services.getDB().then(db=>setBlogs(db))
+  useEffect(() => { //Get DB
+    services.getDB().then(db => setBlogs(db))
   },[])
 
-  useEffect(()=>{
+  useEffect(() => { // Get User Cookie if available
     const userCookie = window.localStorage.getItem('blogListUserInformation')
     if (userCookie){
       const usr = JSON.parse(userCookie)
@@ -30,13 +32,26 @@ function App() {
     }
   },[])
 
+  const postRef = useRef()
+
   return (
     <div>
       <h1>Blog List Application</h1>
       <StatusMessage status={status}/>
-      <LoginForm user={user} setUser={setUser} setStatus={setStatus}/>
-      <PostForm user={user} blogs={blogs} updateBlog={setBlogs} setStatus={setStatus}/>
-      <BlogList list={blogs} setBlogs={setBlogs} setStatus={setStatus}/>
+      { user ?
+        <LoginForm user={user} setUser={setUser} setStatus={setStatus}/>
+        :
+        <Toggable name='Login'>
+          <LoginForm user={user} setUser={setUser} setStatus={setStatus}/>
+        </Toggable>
+      }
+      { user ?
+        <Toggable name='Make a Post' ref={postRef}>
+          <PostForm blogs={blogs} updateBlog={setBlogs} setStatus={setStatus} parent={postRef}/>
+        </Toggable>
+        : null
+      }
+      <BlogList list={blogs} setStatus={setStatus}/>
     </div>
   )
 }

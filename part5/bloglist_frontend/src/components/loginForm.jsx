@@ -42,20 +42,20 @@ const LoginForm = ({ user, setUser, setStatus }) => {
     return (
       <div>
         <h2>Hello {user.name}</h2>
-        <button onClick={()=>{
+        <button onClick={() => {
           setUser(null)
           services.setToken(null)
           setUsername('')
           setPassword('')
           window.localStorage.removeItem('blogListUserInformation')
           setStatus(null)
-          }}>Logout</button>
+        }}>Logout</button>
       </div>
     )
   }
   return(
     <form onSubmit={handleLogin}>
-      <div>
+      <div className='login-form'>
         <h2>Login</h2>
         username: <input onChange={handleUsernameChange}/><br />
         password: <input type="password" onChange={handlePasswordChange}/><br />

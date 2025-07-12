@@ -1,0 +1,6 @@
+.blog-item{
+  border: 1px solid black;
+  margin-bottom: 1em;
+  width: fit-content;
+  padding: 0.2em;
+}

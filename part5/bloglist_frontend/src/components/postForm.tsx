@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import services from '../services/blogServices'
 
-const PostForm = ({ user, blogs, updateBlog, setStatus }) => {
+interface PostFormTypes {
+  blogs: Array<object>,
+  updateBlog: React.Dispatch<Array<object>>,
+  setStatus: React.Dispatch<object>,
+  parent: React.RefObject<{ setState: React.Dispatch<boolean> }>
+}
+
+const PostForm = ({ blogs, updateBlog, setStatus, parent }: PostFormTypes) => {
   const [blogTitle, setTitle] = useState('')
   const [blogAuthor, setAuthor] = useState('')
   const [blogUrl, setUrl] = useState('')
@@ -37,6 +44,7 @@ const PostForm = ({ user, blogs, updateBlog, setStatus }) => {
         type:'success'
       }
       setStatus(status)
+      parent.current.setState(false)
     }
     catch(exception){
       const status = {
@@ -46,22 +54,18 @@ const PostForm = ({ user, blogs, updateBlog, setStatus }) => {
       setStatus(status)
     }
   }
-  
 
-  if (user){
-    return(
-      <form onSubmit={handleNewPost}>
-        <div>
+  return(
+    <form onSubmit={handleNewPost}>
+      <div>
         <h2>Add New Blog</h2>
-          Title: <input type='text' onChange={handleTitle}/><br></br>
-          Author: <input type='text' onChange={handleAuthor}/><br></br>
-          Url: <input type='text' onChange={handleUrl}/><br></br>
-          <button type='submit'>Send</button>
-        </div>
-      </form>
-    )
-  }
-  return null
+        Title: <input type='text' onChange={handleTitle}/><br></br>
+        Author: <input type='text' onChange={handleAuthor}/><br></br>
+        Url: <input type='text' onChange={handleUrl}/><br></br>
+        <button type='submit'>Send</button>
+      </div>
+    </form>
+  )
 }
 
 export default PostForm

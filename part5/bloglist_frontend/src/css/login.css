@@ -1,0 +1,11 @@
+@keyframes fadeIn {
+  0% {
+    opacity: 0%;
+  }
+  100% {
+    opacity: 100%;
+  }
+}
+.login-form{
+  animation: 0.7s ease-in 0s 1 fadeIn;
+}

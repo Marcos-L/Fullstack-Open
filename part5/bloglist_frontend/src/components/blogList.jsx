@@ -1,48 +1,41 @@
-import services from "../services/blogServices";
+import { useState } from 'react'
+import Blog from './blog'
 
-const BlogList = ({ list, setBlogs, setStatus}) => {
+const BlogList = ({ list, setStatus }) => {
+  const [sortType, setSort] = useState('')
 
-  const removePost = async (id) => {
-    try{
-      const confirmation = confirm('Are you sure you want to delete this post?')
-      if (confirmation){
-        const post = await services.delFromDB(id)
-        const new_list = list.filter(blog=>blog.id!==id)
-        setBlogs(new_list)
-        const status = {
-          message:`Post ${post.title} by ${post.author} was deleted successfully`,
-          type:'success'
-        }
-        setStatus(status)
-      }
-    }
-    catch (exception){
-      const status = {
-        message:exception.response.data.error,
-        type:'error'
-      }
-      setStatus(status)
-    }
+  const bloglist = list.map(blog => {
+    return <Blog key={blog.id} blog={blog} setStatus={setStatus}/>
+  })
+
+  const handleSort = (event) => {
+    setSort(event.target.value)
   }
 
-  const bloglist = []
-  list.forEach(blog => {
-    bloglist.push(<li key={blog.id}><div>
-      Title: {blog.title}<br></br>
-      Author: {blog.author}<br></br>
-      Likes: {blog.likes}<br></br>
-      Url: <a href={blog.url}>{blog.url}</a><br></br>
-      <button onClick={async ()=>{
-        await removePost(blog.id)
-      }}>Delete</button>
-    </div></li>)
-  })
+  const comparatorFunc = (a,b) => {
+    if (sortType && sortType !== 'likes'){
+      return (a.props.blog[sortType] >= b.props.blog[sortType])*2-1
+    }
+    else if (sortType){
+      return b.props.blog[sortType] - a.props.blog[sortType]
+    }
+    else{
+      return 1
+    }
+  }
 
   return (
     <div>
       <h2>Blogs</h2>
+      <h3>Sorting Options</h3>
+      <form onChange={handleSort}>
+        <label><input name='Sort' value='likes' type="radio"/>Likes</label>
+        <label><input name='Sort' value='title' type="radio"/>Title</label>
+        <label><input name='Sort' value='author' type="radio"/>Author</label>
+        <label><input name='Sort' value='' type="radio" defaultChecked={true}/>None</label>
+      </form>
       <ul>
-        {bloglist}
+        {bloglist.sort(comparatorFunc)}
       </ul>
     </div>
   )

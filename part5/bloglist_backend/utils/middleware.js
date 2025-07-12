@@ -74,6 +74,10 @@ const errorHandler = (error, request, response, next) => {
     return response.status(401).json({
       error: 'token expired'
     })
+  } else if (error.name === 'TypeError' && error.message.includes('Cannot read properties of null (reading \'_id\')')) {
+    return response.status(401).json({
+      error: 'Must be logged in first!'
+    })
   }
 
   next(error)

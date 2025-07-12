@@ -95,6 +95,11 @@ bloglistRouter.patch('/:id', async (request, response, next) => {
           await oldBlog.save()
           return response.status(200).json(newBlog).end()
         }
+        else if (newBlog.likes){
+          oldBlog.likes = newBlog.likes
+          await oldBlog.save()
+          return response.status(200).json(newBlog).end()
+        }
         else{
           return response.status(401).json({ error:'Unauthorized access' })
         }
